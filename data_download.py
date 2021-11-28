@@ -1,4 +1,4 @@
-import yaml
+# -*- coding: utf-8 -*-
 import sys
 import requests
 import os
@@ -34,12 +34,12 @@ confirmation_code = re.findall('confirm=(.{4})', confirm_page)[0]
 
 print('[*] Downloading data...')
 download('https://drive.google.com/uc?export=download&confirm=CONFIRM&id=1MxCUvKxejnwWnoZ-KoCyMCXo3TLhRuTo'.replace(
-    'CONFIRM', confirmation_code), 'data/viton_resize.tar.gz', cookies=drive_request.cookies)
+    'CONFIRM', confirmation_code), '/mnt/nas/dataset_share/VITON/data/viton_resize.tar.gz', cookies=drive_request.cookies)
 
-tarfile.open("data/viton_resize.tar.gz").extractall(path='data/')
+tarfile.open("/mnt/nas/dataset_share/VITON/data/viton_resize.tar.gz").extractall(path='/mnt/nas/dataset_share/VITON/data/')
 
-shutil.move('data/viton_resize/test/', 'data/test/')
-shutil.move('data/viton_resize/train/', 'data/train/')
+shutil.move('/mnt/nas/dataset_share/VITON/data/viton_resize/test/', 'mnt/nas/dataset_share/VITON/data/test/')
+shutil.move('/mnt/nas/dataset_share/VITON/data/viton_resize/train/', 'mnt/nas/dataset_share/VITON/data/train/')
 
-os.rmdir('data/viton_resize/')
-os.remove('data/viton_resize.tar.gz')
+os.rmdir('/mnt/nas/dataset_share/VITON/data/viton_resize/')
+os.remove('/mnt/nas/dataset_share/VITON/data/viton_resize.tar.gz')
