@@ -19,7 +19,7 @@ def get_opt():
     parser.add_argument("--gpu_ids", default = "")
     parser.add_argument('-j', '--workers', type=int, default=1)
     parser.add_argument('-b', '--batch-size', type=int, default=4)
-    
+
     parser.add_argument("--dataroot", default = "data")
     parser.add_argument("--datamode", default = "train")
     parser.add_argument("--stage", default = "GMM")
@@ -33,6 +33,8 @@ def get_opt():
     parser.add_argument('--checkpoint', type=str, default='', help='model checkpoint for test')
     parser.add_argument("--display_count", type=int, default = 1)
     parser.add_argument("--shuffle", action='store_true', help='shuffle input data')
+
+
 
     opt = parser.parse_args()
     return opt
@@ -66,7 +68,8 @@ def test_gmm(opt, test_loader, model, board):
         im_c =  inputs['parse_cloth'].cuda()
         im_g = inputs['grid_image'].cuda()
             
-        grid, theta = model(agnostic, c)
+        # grid, theta = model(agnostic, c)
+        grid, theta, VIB_loss = model(im, c)
         warped_cloth = F.grid_sample(c, grid, padding_mode='border')
         warped_mask = F.grid_sample(cm, grid, padding_mode='zeros')
         warped_grid = F.grid_sample(im_g, grid, padding_mode='zeros')
@@ -80,8 +83,9 @@ def test_gmm(opt, test_loader, model, board):
 
         if (step+1) % opt.display_count == 0:
             board_add_images(board, 'combine', visuals, step+1)
+            L1_loss = criterionL1(warped_cloth, im_c)
             t = time.time() - iter_start_time
-            print('step: %8d, time: %.3f' % (step+1, t), flush=True)
+            print('step: %8d, time: %.3f, L1_loss: %4f, VIB_loss: %4f' % (step+1, t, L1_loss.item(), VIB_loss), flush=True)
         
 
 

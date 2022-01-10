@@ -38,6 +38,8 @@ def get_opt():
     parser.add_argument("--decay_step", type=int, default = 100000)
     parser.add_argument("--shuffle", action='store_true', help='shuffle input data')
 
+    parser.add_argument("--beta", type=float, default=0.00)
+
     opt = parser.parse_args()
     return opt
 
@@ -76,7 +78,7 @@ def train_gmm(opt, train_loader, model, board):
         visuals = [ [im_h, shape, im_pose], 
                    [c, warped_cloth, im_c], 
                    [warped_grid, (warped_cloth+im)*0.5, im]]
-        beta = 0.000
+        beta = opt.beta
         loss = criterionL1(warped_cloth, im_c) + beta * VIB_loss
         optimizer.zero_grad()
         loss.backward()
