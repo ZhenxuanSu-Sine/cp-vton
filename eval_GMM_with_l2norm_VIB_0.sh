@@ -1,0 +1,1 @@
+python test.py --name gmm_with_l2norm_VIB_0 --stage GMM --workers 4 --dataroot /mnt/nas/dataset_share/VITON/data/ --datamode test --data_list test_pairs.txt --checkpoint checkpoints/gmm_with_l2norm_VIB_0/gmm_final.pth
