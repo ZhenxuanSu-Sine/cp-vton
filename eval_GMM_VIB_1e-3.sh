@@ -1,0 +1,1 @@
+python test.py --name gmm_with_parse_with_VIB_1e-3 --stage GMM --workers 4 --dataroot /mnt/nas/dataset_share/VITON/data/ --datamode test --data_list test_pairs.txt --checkpoint checkpoints/gmm_with_parse_VIB_1e-3/gmm_final.pth
