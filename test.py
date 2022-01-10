@@ -54,6 +54,8 @@ def test_gmm(opt, test_loader, model, board):
     if not os.path.exists(warp_mask_dir):
         os.makedirs(warp_mask_dir)
 
+    criterionL1 = nn.L1Loss()
+
     for step, inputs in enumerate(test_loader.data_loader):
         iter_start_time = time.time()
         
