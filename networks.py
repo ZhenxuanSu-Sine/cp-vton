@@ -415,8 +415,8 @@ class GMM(nn.Module):
     def forward(self, inputA, inputB):
         featureA = self.extractionA(inputA)
         featureB = self.extractionB(inputB)
-        featureA = self.l2norm(featureA)
-        featureB = self.l2norm(featureB)
+        # featureA = self.l2norm(featureA)
+        # featureB = self.l2norm(featureB)
         correlation = self.correlation(featureA, featureB)
 
         theta = self.regression(correlation)
