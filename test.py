@@ -51,6 +51,8 @@ def test_gmm(opt, test_loader, model, board):
     warp_mask_dir = os.path.join(save_dir, 'warp-mask')
     if not os.path.exists(warp_mask_dir):
         os.makedirs(warp_mask_dir)
+    
+    criterionL1 = nn.L1Loss()
 
     for step, inputs in enumerate(test_loader.data_loader):
         iter_start_time = time.time()
@@ -81,7 +83,8 @@ def test_gmm(opt, test_loader, model, board):
         if (step+1) % opt.display_count == 0:
             board_add_images(board, 'combine', visuals, step+1)
             t = time.time() - iter_start_time
-            print('step: %8d, time: %.3f' % (step+1, t), flush=True)
+            L1_loss = criterionL1(warped_cloth, im_c)
+            print('step: %8d, time: %.3f, L1_loss: %4f' % (step+1, t, L1_loss.item()), flush=True)
         
 
 
