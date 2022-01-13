@@ -425,12 +425,10 @@ def KL_to_normal(q_dist):
     sigma_q = torch.nn.functional.softplus(q_dist[:, K:])
     mu_p = torch.zeros((b, K, w, h)).cuda()
     sigma_p = torch.ones((b, K, w, h)).cuda()
-
     mu_diff = mu_p - mu_q
     mu_diff_sq = torch.mul(mu_diff, mu_diff)
     logdet_sigma_q = torch.sum(2 * torch.log(torch.clamp(sigma_q, min=1e-8)), dim=(1, 2, 3))
     logdet_sigma_p = torch.sum(2 * torch.log(torch.clamp(sigma_p, min=1e-8)), dim=(1, 2, 3))
-
     fs = torch.sum(torch.div(sigma_q ** 2, sigma_p ** 2), dim=(1,2,3)) + torch.sum(torch.div(mu_diff_sq, sigma_p ** 2), dim=(1,2,3))
     two_kl = fs - K * w * h + logdet_sigma_p - logdet_sigma_q
     return two_kl * 0.5
@@ -466,9 +464,9 @@ class GMM(nn.Module):
         # featureA = self.l2norm(featureA)
         # featureB = self.l2norm(featureB)
         # try VIB
+        VIB_loss = torch.mean(KL_to_normal(q_dist=featureA))
         featureA = self.gauss_sampling(featureA)
         featureB = self.gauss_sampling(featureB)
-        VIB_loss = torch.mean(KL_to_normal(q_dist=featureA))
         # VIB end
         correlation = self.correlation(featureA, featureB)
 
