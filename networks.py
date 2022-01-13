@@ -428,11 +428,11 @@ def KL_to_normal(q_dist):
 
     mu_diff = mu_p - mu_q
     mu_diff_sq = torch.mul(mu_diff, mu_diff)
-    logdet_sigma_q = torch.sum(2 * torch.log(torch.clamp(sigma_q, min=1e-8)), dim=1)
-    logdet_sigma_p = torch.sum(2 * torch.log(torch.clamp(sigma_p, min=1e-8)), dim=1)
+    logdet_sigma_q = torch.sum(2 * torch.log(torch.clamp(sigma_q, min=1e-8)), dim=(1, 2, 3))
+    logdet_sigma_p = torch.sum(2 * torch.log(torch.clamp(sigma_p, min=1e-8)), dim=(1, 2, 3))
 
-    fs = torch.sum(torch.div(sigma_q ** 2, sigma_p ** 2), dim=1) + torch.sum(torch.div(mu_diff_sq, sigma_p ** 2), dim=1)
-    two_kl = fs - K + logdet_sigma_p - logdet_sigma_q
+    fs = torch.sum(torch.div(sigma_q ** 2, sigma_p ** 2), dim=(1,2,3)) + torch.sum(torch.div(mu_diff_sq, sigma_p ** 2), dim=(1,2,3))
+    two_kl = fs - K * w * h + logdet_sigma_p - logdet_sigma_q
     return two_kl * 0.5
 
 
