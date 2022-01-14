@@ -8,6 +8,7 @@ import os
 import time
 from cp_dataset import CPDataset, CPDataLoader
 from networks import GMM, UnetGenerator, load_checkpoint
+from networks_baseline import GMM_baseline
 
 from tensorboardX import SummaryWriter
 from visualization import board_add_image, board_add_images, save_images
@@ -38,9 +39,11 @@ def get_opt():
     return opt
 
 
-def test_gmm_VIB(opt, test_loader_im, test_loader_c, models, board):
+def test_gmm_VIB(opt, test_loader_im, test_loader_c, baseline_model, models, board):
     import matplotlib.pyplot as plt
     import torchvision.transforms as transforms
+    baseline_model.cuda()
+    baseline_model.eval()
     for model in models:
         model.cuda()
         model.eval()
@@ -73,10 +76,14 @@ def test_gmm_VIB(opt, test_loader_im, test_loader_c, models, board):
         im_g = inputs_im['grid_image'].cuda()
 
         # warped_clothes = []
-        titles = ['image', 'cloth']
+        titles = ['image', 'cloth', 'baseline']
         images = [im[0, :, :, :], c[0, :, :, :]]
+        agnostic = agnostic[0: 1, :, :, :]
         im = im[0: 1, :, :, :]
         c = c[0: 1, :, :, :]
+        grid, theta = baseline_model(agnostic, c)
+        warped_cloth = F.grid_sample(c, grid, padding_mode='border')
+        images.append(warped_cloth[0, :, :, :])
         for model in models:
             grid, theta, VIB_loss = model(im, c)
             warped_cloth = F.grid_sample(c, grid, padding_mode='border')
@@ -91,7 +98,7 @@ def test_gmm_VIB(opt, test_loader_im, test_loader_c, models, board):
             # print(img[0, 0, 0])
             img = transforms.Normalize((-1,), (2,))(img)
             # print(img[0, 0, 0])
-            plt.subplot((len(images) + 1) // 2, 2, i + 1), plt.imshow(img)
+            plt.subplot((len(images) + 2) // 2, 2, i + 1), plt.imshow(img)
             plt.title(titles[i])
             plt.xticks([]), plt.yticks([])
 
@@ -175,9 +182,10 @@ def main():
             model = GMM(opt)
             load_checkpoint(model, "checkpoints/%s/gmm_final.pth" % checkpoint)
             models.append(model)
-        # load_checkpoint(model, opt.checkpoint)
+        baseline = GMM_baseline(opt)
+        load_checkpoint(baseline, "checkpoints/gmm_train_new/gmm_final.pth")
         with torch.no_grad():
-            test_gmm_VIB(opt, train_loader_im, train_loader_c, models, board)
+            test_gmm_VIB(opt, train_loader_im, train_loader_c, baseline, models, board)
     elif opt.stage == 'TOM':
         model = UnetGenerator(25, 4, 6, ngf=64, norm_layer=nn.InstanceNorm2d)
         load_checkpoint(model, opt.checkpoint)
