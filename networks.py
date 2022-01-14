@@ -440,6 +440,7 @@ class GMM(nn.Module):
 
     def __init__(self, opt):
         super(GMM, self).__init__()
+        self.name = opt.checkpoint
         self.extractionA = FeatureExtraction(3, ngf=64, n_layers=3, norm_layer=nn.BatchNorm2d)
         self.extractionB = FeatureExtraction(3, ngf=64, n_layers=3, norm_layer=nn.BatchNorm2d)
         self.l2norm = FeatureL2Norm()
@@ -485,6 +486,10 @@ def save_checkpoint(model, save_path):
 
 def load_checkpoint(model, checkpoint_path):
     if not os.path.exists(checkpoint_path):
+        print('checkpoint %s not found!' % checkpoint_path)
         return
     model.load_state_dict(torch.load(checkpoint_path))
+    end_pos = checkpoint_path.rfind('/')
+    start_pos = checkpoint_path.rfind('/', 0, end_pos)
+    model.name = checkpoint_path[start_pos + 1: end_pos]
     model.cuda()
