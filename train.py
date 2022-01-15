@@ -73,7 +73,7 @@ def train_gmm(opt, train_loader, model, board):
         # grid, theta = model(agnostic, c)
         grid, theta, VIB_loss = model(im, c)
         c = c.repeat(opt.num_samples, 1, 1, 1)
-        cm = c.repeat(opt.num_samples, 1, 1, 1)
+        cm = cm.repeat(opt.num_samples, 1, 1, 1)
         im_g = im_g.repeat(opt.num_samples, 1, 1, 1)
         warped_cloth = F.grid_sample(c, grid, padding_mode='border')
         warped_mask = F.grid_sample(cm, grid, padding_mode='zeros')

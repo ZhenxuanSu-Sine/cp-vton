@@ -79,7 +79,7 @@ def test_gmm(opt, test_loader, model, board):
         # grid, theta, VIB_loss = model(masked_image, c)
 
         c = c.repeat(opt.num_samples, 1, 1, 1)
-        cm = c.repeat(opt.num_samples, 1, 1, 1)
+        cm = cm.repeat(opt.num_samples, 1, 1, 1)
         im_g = im_g.repeat(opt.num_samples, 1, 1, 1)
 
         warped_cloth = F.grid_sample(c, grid, padding_mode='border')
