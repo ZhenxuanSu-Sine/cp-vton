@@ -441,6 +441,7 @@ class GMM(nn.Module):
     def __init__(self, opt):
         super(GMM, self).__init__()
         self.name = opt.checkpoint
+        self.num_samples = opt.num_samples
         self.extractionA = FeatureExtraction(3, ngf=64, n_layers=3, norm_layer=nn.BatchNorm2d)
         self.extractionB = FeatureExtraction(3, ngf=64, n_layers=3, norm_layer=nn.BatchNorm2d)
         self.l2norm = FeatureL2Norm()
@@ -455,9 +456,9 @@ class GMM(nn.Module):
         b, c, w, h = feature.size()
         assert (c % 2 == 0)
         K = c // 2
-        mu = feature[:, : K]
-        sigma = torch.nn.functional.softplus(feature[:, K:])
-        return mu + sigma * self.gaussian_noise((b, K, w, h))
+        mu = feature[:, : K].repeat(self.num_samples, 1, 1, 1)
+        sigma = torch.nn.functional.softplus(feature[:, K:]).repeat(self.num_samples, 1, 1, 1)
+        return mu + sigma * self.gaussian_noise((b * self.num_samples, K, w, h))
 
     def forward(self, inputA, inputB):
         featureA = self.extractionA(inputA)

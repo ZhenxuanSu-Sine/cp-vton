@@ -39,6 +39,7 @@ def get_opt():
     parser.add_argument("--shuffle", action='store_true', help='shuffle input data')
 
     parser.add_argument("--beta", type=float, default=0.00)
+    parser.add_argument("--num_samples", type=int, default=30)
 
     opt = parser.parse_args()
     return opt
@@ -68,7 +69,7 @@ def train_gmm(opt, train_loader, model, board):
         cm = inputs['cloth_mask'].cuda()
         im_c =  inputs['parse_cloth'].cuda()
         im_g = inputs['grid_image'].cuda()
-            
+        pcm = inputs['parse_cloth_mask'].cuda()
         # grid, theta = model(agnostic, c)
         grid, theta, VIB_loss = model(im, c)
         warped_cloth = F.grid_sample(c, grid, padding_mode='border')
@@ -79,7 +80,7 @@ def train_gmm(opt, train_loader, model, board):
                    [c, warped_cloth, im_c], 
                    [warped_grid, (warped_cloth+im)*0.5, im]]
         beta = opt.beta
-        loss = criterionL1(warped_cloth, im_c) + beta * VIB_loss
+        loss = criterionL1(warped_cloth * pcm, im_c) + beta * VIB_loss
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
