@@ -98,7 +98,7 @@ def test_gmm_VIB(opt, test_loader_im, baseline_model, models, board):
             img = transforms.Normalize((-1,), (2,))(img)
             # print(img[0, 0, 0])
             plt.rcParams['figure.facecolor'] = 'grey'
-            plt.subplot((len(images) + 1) // 2, 2, i + 1), plt.imshow(img)
+            plt.subplot(4, (len(images) + 3) // 4, i + 1), plt.imshow(img)
             plt.title(titles[i])
             plt.xticks([]), plt.yticks([])
 
@@ -176,7 +176,7 @@ def main():
 
     # create model & train
     if opt.stage == 'GMM':
-        checkpoints = ['gmm_with_VIB_0', 'gmm_with_VIB_1e-2', 'gmm_with_VIB_1e-3', 'gmm_with_VIB_1e-5']
+        checkpoints = ['gmm_with_VIB_0', 'gmm_with_VIB_1e-5', 'gmm_with_VIB_1e-3', 'gmm_with_VIB_1e-2', 'gmm_with_VIB_1', 'gmm_with_VIB_1e3']
         models = []
         for checkpoint in checkpoints:
             model = GMM(opt)
