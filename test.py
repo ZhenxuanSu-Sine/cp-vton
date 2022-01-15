@@ -75,7 +75,13 @@ def test_gmm(opt, test_loader, model, board):
         masked_image = agnostic[:, 1: 4, :, :]
         # grid, theta, VIB_loss = model(agnostic, c)
         grid, theta, VIB_loss = model(im, c)
+
         # grid, theta, VIB_loss = model(masked_image, c)
+
+        c = c.repeat(opt.num_samples, 1, 1, 1)
+        cm = c.repeat(opt.num_samples, 1, 1, 1)
+        im_g = im_g.repeat(opt.num_samples, 1, 1, 1)
+
         warped_cloth = F.grid_sample(c, grid, padding_mode='border')
         warped_mask = F.grid_sample(cm, grid, padding_mode='zeros')
         warped_grid = F.grid_sample(im_g, grid, padding_mode='zeros')
