@@ -39,7 +39,7 @@ def get_opt():
     return opt
 
 
-def test_gmm_VIB(opt, test_loader_im, test_loader_c, baseline_model, models, board):
+def test_gmm_VIB(opt, test_loader_im, baseline_model, models, board):
     import matplotlib.pyplot as plt
     import torchvision.transforms as transforms
     baseline_model.cuda()
@@ -60,11 +60,10 @@ def test_gmm_VIB(opt, test_loader_im, test_loader_c, baseline_model, models, boa
 
     criterionL1 = nn.L1Loss()
 
-    for (step_im, inputs_im), (step_c, inputs_c) in zip(enumerate(test_loader_im.data_loader),
-                                                        enumerate(test_loader_c.data_loader)):
+    for (step_im, inputs_im) in enumerate(test_loader_im.data_loader):
         iter_start_time = time.time()
 
-        c_names = inputs_c['c_name']
+        c_names = inputs_im['c_name']
         im = inputs_im['image'].cuda()
         im_pose = inputs_im['pose_image'].cuda()
         im_h = inputs_im['head'].cuda()
@@ -76,8 +75,8 @@ def test_gmm_VIB(opt, test_loader_im, test_loader_c, baseline_model, models, boa
         im_g = inputs_im['grid_image'].cuda()
 
         # warped_clothes = []
-        titles = ['image', 'cloth', 'baseline']
-        images = [im[0, :, :, :], c[0, :, :, :]]
+        titles = ['image', 'cloth', 'ground truth', 'baseline']
+        images = [im[0, :, :, :], c[0, :, :, :], im_c[0, :, :, :]]
         agnostic = agnostic[0: 1, :, :, :]
         im = im[0: 1, :, :, :]
         c = c[0: 1, :, :, :]
@@ -98,9 +97,11 @@ def test_gmm_VIB(opt, test_loader_im, test_loader_c, baseline_model, models, boa
             # print(img[0, 0, 0])
             img = transforms.Normalize((-1,), (2,))(img)
             # print(img[0, 0, 0])
-            plt.subplot((len(images) + 2) // 2, 2, i + 1), plt.imshow(img)
+            plt.rcParams['figure.facecolor'] = 'grey'
+            plt.subplot((len(images) + 1) // 2, 2, i + 1), plt.imshow(img)
             plt.title(titles[i])
             plt.xticks([]), plt.yticks([])
+
 
         plt.show()
         input('next pair')
@@ -167,7 +168,6 @@ def main():
 
     # create dataloader
     train_loader_im = CPDataLoader(opt, train_dataset)
-    train_loader_c = CPDataLoader(opt, train_dataset)
 
     # visualization
     if not os.path.exists(opt.tensorboard_dir):
@@ -185,7 +185,7 @@ def main():
         baseline = GMM_baseline(opt)
         load_checkpoint(baseline, "checkpoints/gmm_train_new/gmm_final.pth")
         with torch.no_grad():
-            test_gmm_VIB(opt, train_loader_im, train_loader_c, baseline, models, board)
+            test_gmm_VIB(opt, train_loader_im, baseline, models, board)
     elif opt.stage == 'TOM':
         model = UnetGenerator(25, 4, 6, ngf=64, norm_layer=nn.InstanceNorm2d)
         load_checkpoint(model, opt.checkpoint)
