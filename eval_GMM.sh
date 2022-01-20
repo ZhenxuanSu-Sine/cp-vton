@@ -1,0 +1,1 @@
+python test.py --name gmm_train_new --stage GMM --workers 4 --dataroot /mnt/nas/dataset_share/VITON/data/ --datamode test --data_list new_test_pairs.txt --checkpoint checkpoints/gmm_train_new/gmm_final.pth

@@ -76,7 +76,7 @@ def train_gmm(opt, train_loader, model, board):
         visuals = [ [im_h, shape, im_pose], 
                    [c, warped_cloth, im_c], 
                    [warped_grid, (warped_cloth+im)*0.5, im]]
-
+        pcm = pcm.unsqueeze(1)
         masked_warped_cloth = warped_cloth * pcm + (1 - pcm)
         # loss = criterionL1(warped_cloth, im_c)
         loss = criterionL1(masked_warped_cloth, im_c)
