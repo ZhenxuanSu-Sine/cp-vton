@@ -35,6 +35,8 @@ def get_opt():
     parser.add_argument("--display_count", type=int, default=1)
     parser.add_argument("--shuffle", action='store_true', help='shuffle input data')
 
+    parser.add_argument("--num_samples", type=int, default=1)
+
     opt = parser.parse_args()
     return opt
 
@@ -83,12 +85,16 @@ def test_gmm_VIB(opt, test_loader_im, baseline_model, models, board):
         grid, theta = baseline_model(agnostic, c)
         warped_cloth = F.grid_sample(c, grid, padding_mode='border')
         images.append(warped_cloth[0, :, :, :])
+        loss = criterionL1(warped_cloth[0: 1, :, :, :], im_c[0: 1, :, :, :])
+        print("Baseline L1 loss: %4f" % (loss.item()))
         for model in models:
             grid, theta, VIB_loss = model(im, c)
             warped_cloth = F.grid_sample(c, grid, padding_mode='border')
             titles.append(model.name)
             images.append(warped_cloth[0, :, :, :])
-            print("VIB loss of %s: %4f" % (model.name, VIB_loss))
+            # print("VIB loss of %s: %4f" % (model.name, VIB_loss))
+            loss = criterionL1(warped_cloth[0: 1, :, :, :], im_c[0: 1, :, :, :])
+            print("%s L1 loss: %4f" % (model.name, loss.item()))
         # visuals = [ [im_h, shape, im_pose],
         #            [c, warped_cloth, im_c],
         #            [warped_grid, (warped_cloth+im)*0.5, im]]
@@ -176,7 +182,7 @@ def main():
 
     # create model & train
     if opt.stage == 'GMM':
-        checkpoints = ['gmm_with_VIB_0', 'gmm_with_VIB_1e-5', 'gmm_with_VIB_1e-3', 'gmm_with_VIB_1e-2', 'gmm_with_VIB_1', 'gmm_with_VIB_1e3']
+        checkpoints = ['gmm_with_VIB_0', 'gmm_with_VIB_1e-5', 'gmm_with_VIB_1e-3', 'gmm_with_VIB_1e-2']
         models = []
         for checkpoint in checkpoints:
             model = GMM(opt)

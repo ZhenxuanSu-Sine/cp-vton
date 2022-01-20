@@ -87,6 +87,8 @@ class CPDataset(data.Dataset):
         phead = torch.from_numpy(parse_head) # [0,1]
         pcm = torch.from_numpy(parse_cloth) # [0,1]
 
+        # print((torch.sum(pcm == 0), torch.sum(pcm == 1)))
+
         # upper cloth
         im_c = im * pcm + (1 - pcm) # [-1,1], fill 1 for other parts
         im_h = im * phead - (1 - phead) # [-1,1], fill 0 for other parts
