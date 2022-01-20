@@ -64,6 +64,7 @@ def train_gmm(opt, train_loader, model, board):
         agnostic = inputs['agnostic'].cuda()
         c = inputs['cloth'].cuda()
         cm = inputs['cloth_mask'].cuda()
+        pcm = inputs['pcm'].cuda()
         im_c =  inputs['parse_cloth'].cuda()
         im_g = inputs['grid_image'].cuda()
             
@@ -75,8 +76,10 @@ def train_gmm(opt, train_loader, model, board):
         visuals = [ [im_h, shape, im_pose], 
                    [c, warped_cloth, im_c], 
                    [warped_grid, (warped_cloth+im)*0.5, im]]
-        
-        loss = criterionL1(warped_cloth, im_c)    
+
+        masked_warped_cloth = warped_cloth * pcm + (1 - pcm)
+        # loss = criterionL1(warped_cloth, im_c)
+        loss = criterionL1(masked_warped_cloth, im_c)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()

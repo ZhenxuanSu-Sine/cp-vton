@@ -135,6 +135,7 @@ class CPDataset(data.Dataset):
             'image':    im,         # for visualization
             'agnostic': agnostic,   # for input
             'parse_cloth': im_c,    # for ground truth
+            'pcm': pcm,             # ground truth of warped mask
             'shape': shape,         # for visualization
             'head': im_h,           # for visualization
             'pose_image': im_pose,  # for visualization
